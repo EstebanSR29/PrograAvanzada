@@ -30,6 +30,53 @@ namespace KN_WEB.BaseDatos
         public virtual DbSet<tRol> tRol { get; set; }
         public virtual DbSet<tUsuarios> tUsuarios { get; set; }
     
+        public virtual int ActualizarUsuario(string cedula, string nombre, string correo, Nullable<byte> idRol, Nullable<int> consecutivo)
+        {
+            var cedulaParameter = cedula != null ?
+                new ObjectParameter("Cedula", cedula) :
+                new ObjectParameter("Cedula", typeof(string));
+    
+            var nombreParameter = nombre != null ?
+                new ObjectParameter("Nombre", nombre) :
+                new ObjectParameter("Nombre", typeof(string));
+    
+            var correoParameter = correo != null ?
+                new ObjectParameter("Correo", correo) :
+                new ObjectParameter("Correo", typeof(string));
+    
+            var idRolParameter = idRol.HasValue ?
+                new ObjectParameter("IdRol", idRol) :
+                new ObjectParameter("IdRol", typeof(byte));
+    
+            var consecutivoParameter = consecutivo.HasValue ?
+                new ObjectParameter("Consecutivo", consecutivo) :
+                new ObjectParameter("Consecutivo", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("ActualizarUsuario", cedulaParameter, nombreParameter, correoParameter, idRolParameter, consecutivoParameter);
+        }
+    
+        public virtual int CambiarEstadoUsuario(Nullable<int> consecutivo)
+        {
+            var consecutivoParameter = consecutivo.HasValue ?
+                new ObjectParameter("Consecutivo", consecutivo) :
+                new ObjectParameter("Consecutivo", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("CambiarEstadoUsuario", consecutivoParameter);
+        }
+    
+        public virtual ObjectResult<IniciarSesion_Result> IniciarSesion(string correo, string password)
+        {
+            var correoParameter = correo != null ?
+                new ObjectParameter("Correo", correo) :
+                new ObjectParameter("Correo", typeof(string));
+    
+            var passwordParameter = password != null ?
+                new ObjectParameter("Password", password) :
+                new ObjectParameter("Password", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<IniciarSesion_Result>("IniciarSesion", correoParameter, passwordParameter);
+        }
+    
         public virtual int RegistrarUsuario(string cedula, string nombre, string correo, string password)
         {
             var cedulaParameter = cedula != null ?
@@ -51,17 +98,13 @@ namespace KN_WEB.BaseDatos
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("RegistrarUsuario", cedulaParameter, nombreParameter, correoParameter, passwordParameter);
         }
     
-        public virtual ObjectResult<IniciarSesion_Result> IniciarSesion(string correo, string password)
+        public virtual ObjectResult<ValidarUsuarioIdentificacion_Result> ValidarUsuarioIdentificacion(string cedula)
         {
-            var correoParameter = correo != null ?
-                new ObjectParameter("Correo", correo) :
-                new ObjectParameter("Correo", typeof(string));
+            var cedulaParameter = cedula != null ?
+                new ObjectParameter("Cedula", cedula) :
+                new ObjectParameter("Cedula", typeof(string));
     
-            var passwordParameter = password != null ?
-                new ObjectParameter("Password", password) :
-                new ObjectParameter("Password", typeof(string));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<IniciarSesion_Result>("IniciarSesion", correoParameter, passwordParameter);
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<ValidarUsuarioIdentificacion_Result>("ValidarUsuarioIdentificacion", cedulaParameter);
         }
     }
 }

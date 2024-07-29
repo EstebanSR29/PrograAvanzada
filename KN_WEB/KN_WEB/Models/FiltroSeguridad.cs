@@ -15,8 +15,26 @@ namespace KN_WEB.Models
             {
                 filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary
                 {
-                    {"controller", "Usuario" },
+                    {"controller", "Login" },
                     {"action","Index" }
+                });
+            }
+            base.OnActionExecuting(filterContext);
+        }
+
+
+    }
+
+    public class FiltroAdmin : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            if (filterContext.HttpContext.Session["RolUsuario"].ToString() != "2")
+            {
+                filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary
+                {
+                    {"controller", "Login" },
+                    {"action","Home" }
                 });
             }
             base.OnActionExecuting(filterContext);

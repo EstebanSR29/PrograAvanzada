@@ -1,87 +1,71 @@
 ﻿using KN_WEB.Entidades;
 using KN_WEB.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Security;
 
 namespace KN_WEB.Controllers
 {
-    
+    [FiltroAdmin]
+    [FiltroSeguridad]
     [OutputCache(NoStore = true, VaryByParam ="*", Duration = 0)]
     public class UsuarioController : Controller
     {
         UsuarioModel usuarioM = new UsuarioModel();
 
-        [HttpGet]
-        public ActionResult Index()
-        {
-            return View();
-        }
+        RolModel rolM = new RolModel();
 
-        [HttpPost]
-        public ActionResult Index(Usuario entidad)
-        {
-            var respuesta = usuarioM.IniciarSesion(entidad);
-
-            if (respuesta != null)
-            {
-                Session["NombreUsuario"] = respuesta.Nombre;
-                return RedirectToAction("Home", "Usuario");
-            }
-            else
-            {
-                ViewBag.msj = "Usuario incorrecto o no existe";
-                return View();
-            }
-                
-        }
-
-        [HttpGet]
-        public ActionResult Registro()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public ActionResult Registro(Usuario entidad)
-        {
-            var respuesta = usuarioM.RegistrarUsuario(entidad);
-
-            if (respuesta == true)
-                return RedirectToAction("Index", "Usuario");
-            else
-            {
-                ViewBag.msj = "No se logro registrar el Usuario";
-                return View();
-            }
-        }
-
-        [FiltroSeguridad]
-        [HttpGet]
-        public ActionResult Home()
-        {
-            return View();
-        }
-
-        [FiltroSeguridad]
-        [HttpGet]
-        public ActionResult CerrarSesion()
-        {
-            Session.Clear();
-            return RedirectToAction("Index","Usuario");
-        }
-
-        [FiltroSeguridad]
         [HttpGet]
         public ActionResult ConsultarUsuarios()
         {
             var respuesta = usuarioM.ConsultarUsuarios();
 
             return View(respuesta); 
+        }
+
+        [HttpPost]
+        public ActionResult CambiarEstadoUsuario(Usuario entidad)
+        {
+            var respuesta = usuarioM.CambiarEstadoUsuario(entidad);
+
+            if (respuesta)
+                return RedirectToAction("ConsultarUsuarios", "Usuario");
+            else
+            {
+                ViewBag.msj = "No se logro inactivar el Usuario";
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public ActionResult ActualizarUsuario(int Consecutivo)
+        {
+            var respuesta = usuarioM.ConsultarUsuario(Consecutivo);
+
+            var roles = rolM.ConsultarRoles();
+
+            List<SelectListItem> lstRoles = new List<SelectListItem>();
+            foreach (var item in roles)
+            {
+                lstRoles.Add(new SelectListItem { Value = item.IdRol.ToString(), Text = item.NombreRol.ToString()});
+            }
+
+            ViewBag.roles = lstRoles;
+
+            return View(respuesta);
+        }
+
+        [HttpPost]
+        public ActionResult ActualizarUsuario(Usuario entidad)
+        {
+            var respuesta = usuarioM.ActualizarUsuario(entidad);
+
+            if (respuesta)
+                return RedirectToAction("ConsultarUsuarios", "Usuario");
+            else
+            {
+                ViewBag.msj = "No se logro actualizar el Usuario";
+                return View();
+            }
         }
 
 

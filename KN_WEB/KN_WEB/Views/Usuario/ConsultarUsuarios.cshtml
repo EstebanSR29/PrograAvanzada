@@ -5,16 +5,28 @@
 }
 
 <br>
+<h4>Consulta de Usuarios</h4>
+<hr>
+<br>
+
 <div class="row">
     <div class="col-12">
+        @if (ViewBag.msj != null)
+        {
+            <div class="alert alert-info" role="alert" style="text-align:center">
+                @ViewBag.msj
+            </div>
+        }
 
-        <table id="tablaUsuarios" class="table table-bordered">
+        <table id="tablaUsuarios" class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>Cedula</th>
                     <th>Nombre</th>
                     <th>Correo</th>
                     <th>Estado</th>
+                    <th>Acciones</th>
+                    <th>Cambiar Estado</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,6 +44,33 @@
                         {
                             <td>Inactivo</td>
                         }
+                        <td title="Actualizar" style="text-align:center">
+                            <a href="@Url.Action("ActualizarUsuario","Usuario", new { Consecutivo = @item.Consecutivo})">
+                                <i class="fas fa-user-edit"></i>
+                            </a>
+                        </td>
+                        @if (@item.Estado)
+                        {
+                            <td title="Inactivar" style="text-align:center">
+                                <button type="button" class="btn btn-outline-primary AbrirModal" data-toggle="modal" data-target="#ModalUsuarios"
+                                        data-id="@item.Consecutivo" data-name="@item.Nombre">
+                                    <i class="fa fa-toggle-on fa-2x" aria-hidden="true"></i>
+                                </button>
+                            </td>
+
+                        }
+                        else
+                        {
+                            <td title="Activar" style="text-align:center">
+                                <button type="button" class="btn btn-outline-primary AbrirModal" data-toggle="modal" data-target="#ModalUsuarios"
+                                        data-id="@item.Consecutivo" data-name="@item.Nombre">
+                                    <i class="fa fa-toggle-off fa-2x" aria-hidden="true"></i>
+                                </button>
+                            </td>
+
+                        }
+
+
                     </tr>
                 }
             </tbody>
@@ -40,8 +79,33 @@
     </div>
 </div>
 
+<div class="modal fade" id="ModalUsuarios" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">CONFIRMACION</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("CambiarEstadoUsuario", "Usuario"))
+            {
+                <div class="modal-body">
+                    @Html.Hidden("Consecutivo", "")
+                    ¿Desea cambiar el estado del usuario <label id="Nombre"></label>?
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Procesar</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
 <script src="~/root/plugins/jquery/jquery.min.js"></script>
 <script>
+
     $(document).ready(function () {
         $("#tablaUsuarios").DataTable({
             language: {
@@ -49,4 +113,10 @@
             }
         });
     })
+
+    $(document).on("click", ".AbrirModal", function () {
+        $("#Consecutivo").val($(this).attr('data-id'));
+        $("#Nombre").text($(this).attr('data-name'));
+    });
+
 </script>

@@ -1,0 +1,42 @@
+﻿@model KN_WEB.Entidades.Usuario
+
+@{
+    Layout = "~/Views/Shared/_LayoutExterno.cshtml";
+    ViewBag.Title = "RecuperarAcceso";
+}
+<div class="card">
+    <div class="card-body login-card-body">
+        <p class="login-box-msg">Recuperar Acceso</p>
+
+
+        @if (ViewBag.msj != null)
+        {
+            <div class="alert alert-info" role="alert" style="text-align:center">
+                @ViewBag.msj
+            </div>
+        }
+
+
+
+        @using (Html.BeginForm("RecuperarAcceso", "Login"))
+        {
+            <div class="input-group mb-3">
+                @Html.TextBoxFor(m => m.Cedula, new { @type = "text", @class = "form-control", @placeholder = "Cedula" })
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-id-card"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary btn-block">Procesar</button>
+
+                </div>
+            </div>
+        }
+        <p class="mb-0">
+            <a href="@Url.Action("Registro","Login")" class="text-center">Registrarse</a>
+        </p>
+    </div>
+</div>

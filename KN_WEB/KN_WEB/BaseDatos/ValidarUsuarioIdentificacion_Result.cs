@@ -10,20 +10,11 @@
 namespace KN_WEB.BaseDatos
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class tUsuarios
+    public partial class ValidarUsuarioIdentificacion_Result
     {
         public int Consecutivo { get; set; }
-        public string Cedula { get; set; }
         public string Nombre { get; set; }
         public string Correo { get; set; }
-        public string Password { get; set; }
-        public bool Estado { get; set; }
-        public byte IdRol { get; set; }
-        public Nullable<bool> EsClaveTemporal { get; set; }
-        public Nullable<System.DateTime> ClaveVencimiento { get; set; }
-    
-        public virtual tRol tRol { get; set; }
     }
 }

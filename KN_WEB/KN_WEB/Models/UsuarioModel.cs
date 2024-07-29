@@ -3,6 +3,7 @@ using KN_WEB.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.UI;
 
@@ -16,7 +17,7 @@ namespace KN_WEB.Models
 
             using (var context = new KN_WEB_BDEntities())
             {
-               rowsAffected = context.RegistrarUsuario(entidad.Cedula, entidad.Nombre, entidad.Correo, entidad.Password);
+                rowsAffected = context.RegistrarUsuario(entidad.Cedula, entidad.Nombre, entidad.Correo, entidad.Password);
             }
 
             return (rowsAffected > 0 ? true : false);
@@ -35,10 +36,72 @@ namespace KN_WEB.Models
         {
             using (var context = new KN_WEB_BDEntities())
             {
-                return (from x in context.tUsuarios select x).ToList();
+                int ConsecutivoSesion = int.Parse(HttpContext.Current.Session["ConsecutivoUsuario"].ToString());
+
+                return (from x in context.tUsuarios
+                        where x.Consecutivo != ConsecutivoSesion
+                        select x).ToList();
             }
         }
 
+        public tUsuarios ConsultarUsuario(int Consecutivo)
+        {
+            using (var context = new KN_WEB_BDEntities())
+            {
+                return (from x in context.tUsuarios
+                        where x.Consecutivo == Consecutivo
+                        select x).FirstOrDefault();
+            }
+        }
+
+        public bool CambiarEstadoUsuario(Usuario entidad)
+        {
+            var rowsAffected = 0;
+
+            using (var context = new KN_WEB_BDEntities())
+            {
+                rowsAffected = context.CambiarEstadoUsuario(entidad.Consecutivo);
+            }
+
+            return (rowsAffected > 0 ? true : false);
+        }
+        public bool ActualizarUsuario(Usuario entidad)
+        {
+            var rowsAffected = 0;
+
+            using (var context = new KN_WEB_BDEntities())
+            {
+                rowsAffected = context.ActualizarUsuario(entidad.Cedula, entidad.Nombre, entidad.Correo, entidad.IdRol, entidad.Consecutivo);
+            }
+
+            return (rowsAffected > 0 ? true : false);
+        }
+
+        public ValidarUsuarioIdentificacion_Result ValidarUsuarioIdentificacion(string Cedula) {
+            using (var context = new KN_WEB_BDEntities())
+            {
+                return context.ValidarUsuarioIdentificacion(Cedula).FirstOrDefault();
+            }
+        }
+
+
+        public bool CambiarContrasennaUsuario(int Consecutivo, string contraTemp, bool EsClaveTemporal, DateTime ClaveVencimiento)
+        {
+            var rowsAffected = 0;
+
+            using (var context = new KN_WEB_BDEntities())
+            {
+                var datos = (from x in context.tUsuarios
+                             where x.Consecutivo == Consecutivo
+                             select x).FirstOrDefault();
+
+                datos.Password = contraTemp;
+                datos.EsClaveTemporal = EsClaveTemporal;
+                datos.ClaveVencimiento = ClaveVencimiento;
+                rowsAffected = context.SaveChanges();
+            }
+            return (rowsAffected > 0 ? true : false);
+        }
     }
 }
 

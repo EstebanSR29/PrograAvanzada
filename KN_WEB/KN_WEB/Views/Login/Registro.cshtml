@@ -1,13 +1,12 @@
 ﻿@model KN_WEB.Entidades.Usuario
-
 @{
+    ViewBag.Title = "Registro";
     Layout = "~/Views/Shared/_LayoutExterno.cshtml";
-    ViewBag.Title = "Home Page";
 }
-<div class="card">
-    <div class="card-body login-card-body">
-        <p class="login-box-msg">Iniciar sesion</p>
 
+<div class="card">
+    <div class="card-body register-card-body">
+        <p class="login-box-msg">Registro</p>
 
         @if (ViewBag.msj != null)
         {
@@ -16,10 +15,24 @@
             </div>
         }
 
-
-
-        @using (Html.BeginForm("Index", "Usuario"))
+        @using (Html.BeginForm("Registro", "Login"))
         {
+            <div class="input-group mb-3">
+                @Html.TextBoxFor(m => m.Cedula, new { @type = "text", @class = "form-control", @placeholder = "Cedula", onkeyup = "ConsultarIdentificacion();" })
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-user"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                @Html.TextBoxFor(m => m.Nombre, new { @type = "text", @class = "form-control", @placeholder = "Nombre", @ReadOnly = true })
+                <div class="input-group-append">
+                    <div class="input-group-text">
+                        <span class="fas fa-user"></span>
+                    </div>
+                </div>
+            </div>
             <div class="input-group mb-3">
                 @Html.TextBoxFor(m => m.Correo, new { @type = "email", @class = "form-control", @placeholder = "Correo Electronico" })
                 <div class="input-group-append">
@@ -39,16 +52,13 @@
             <div class="row">
                 <div class="col-4">
                     <button type="submit" class="btn btn-primary btn-block">Procesar</button>
-
                 </div>
             </div>
         }
 
-        <p class="mb-1">
-            <a href="forgot-password.html">Olvide mi contraseña</a>
-        </p>
-        <p class="mb-0">
-            <a href="@Url.Action("Registro","Usuario")" class="text-center">Registrarse</a>
-        </p>
+
+        <a href="@Url.Action("Index","Login")" class="text-center">Iniciar Sesion</a>
     </div>
 </div>
+
+<script src="~/root/funciones/usuario.js"></script>

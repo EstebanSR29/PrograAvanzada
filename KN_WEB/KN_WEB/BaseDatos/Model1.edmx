@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="KN_WEB_BDModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="KN_WEB_BDModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="tRol">
           <Key>
             <PropertyRef Name="IdRol" />
@@ -23,6 +23,8 @@
           <Property Name="Password" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="Estado" Type="bit" Nullable="false" />
           <Property Name="IdRol" Type="tinyint" Nullable="false" />
+          <Property Name="EsClaveTemporal" Type="bit" />
+          <Property Name="ClaveVencimiento" Type="datetime" />
         </EntityType>
         <Association Name="FK_tUsuarios_tRol">
           <End Role="tRol" Type="Self.tRol" Multiplicity="1" />
@@ -36,6 +38,16 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="ActualizarUsuario" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Cedula" Type="varchar" Mode="In" />
+          <Parameter Name="Nombre" Type="varchar" Mode="In" />
+          <Parameter Name="Correo" Type="varchar" Mode="In" />
+          <Parameter Name="IdRol" Type="tinyint" Mode="In" />
+          <Parameter Name="Consecutivo" Type="int" Mode="In" />
+        </Function>
+        <Function Name="CambiarEstadoUsuario" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Consecutivo" Type="int" Mode="In" />
+        </Function>
         <Function Name="IniciarSesion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="Correo" Type="varchar" Mode="In" />
           <Parameter Name="Password" Type="varchar" Mode="In" />
@@ -46,6 +58,9 @@
           <Parameter Name="Correo" Type="varchar" Mode="In" />
           <Parameter Name="Password" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="ValidarUsuarioIdentificacion" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="Cedula" Type="varchar" Mode="In" />
+        </Function>
         <EntityContainer Name="KN_WEB_BDModelStoreContainer">
           <EntitySet Name="tRol" EntityType="Self.tRol" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tUsuarios" EntityType="Self.tUsuarios" Schema="dbo" store:Type="Tables" />
@@ -54,7 +69,8 @@
             <End Role="tUsuarios" EntitySet="tUsuarios" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="KN_WEB_BDModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -77,6 +93,8 @@
           <Property Name="Password" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Estado" Type="Boolean" Nullable="false" />
           <Property Name="IdRol" Type="Byte" Nullable="false" />
+          <Property Name="EsClaveTemporal" Type="Boolean" />
+          <Property Name="ClaveVencimiento" Type="DateTime" Precision="3" />
           <NavigationProperty Name="tRol" Relationship="Self.FK_tUsuarios_tRol" FromRole="tUsuarios" ToRole="tRol" />
         </EntityType>
         <Association Name="FK_tUsuarios_tRol">
@@ -98,15 +116,28 @@
             <End Role="tRol" EntitySet="tRol" />
             <End Role="tUsuarios" EntitySet="tUsuarios" />
           </AssociationSet>
+          <FunctionImport Name="ActualizarUsuario">
+            <Parameter Name="Cedula" Mode="In" Type="String" />
+            <Parameter Name="Nombre" Mode="In" Type="String" />
+            <Parameter Name="Correo" Mode="In" Type="String" />
+            <Parameter Name="IdRol" Mode="In" Type="Byte" />
+            <Parameter Name="Consecutivo" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="CambiarEstadoUsuario">
+            <Parameter Name="Consecutivo" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="IniciarSesion" ReturnType="Collection(KN_WEB_BDModel.IniciarSesion_Result)">
+            <Parameter Name="Correo" Mode="In" Type="String" />
+            <Parameter Name="Password" Mode="In" Type="String" />
+          </FunctionImport>
           <FunctionImport Name="RegistrarUsuario">
             <Parameter Name="Cedula" Mode="In" Type="String" />
             <Parameter Name="Nombre" Mode="In" Type="String" />
             <Parameter Name="Correo" Mode="In" Type="String" />
             <Parameter Name="Password" Mode="In" Type="String" />
           </FunctionImport>
-          <FunctionImport Name="IniciarSesion" ReturnType="Collection(KN_WEB_BDModel.IniciarSesion_Result)">
-            <Parameter Name="Correo" Mode="In" Type="String" />
-            <Parameter Name="Password" Mode="In" Type="String" />
+          <FunctionImport Name="ValidarUsuarioIdentificacion" ReturnType="Collection(KN_WEB_BDModel.ValidarUsuarioIdentificacion_Result)">
+            <Parameter Name="Cedula" Mode="In" Type="String" />
           </FunctionImport>
         </EntityContainer>
         <ComplexType Name="IniciarSesion_Result">
@@ -116,6 +147,13 @@
           <Property Type="String" Name="Correo" Nullable="false" MaxLength="100" />
           <Property Type="Boolean" Name="Estado" Nullable="false" />
           <Property Type="Byte" Name="IdRol" Nullable="false" />
+          <Property Type="Boolean" Name="EsClaveTemporal" Nullable="true" />
+          <Property Type="DateTime" Name="ClaveVencimiento" Nullable="true" Precision="23" />
+        </ComplexType>
+        <ComplexType Name="ValidarUsuarioIdentificacion_Result">
+          <Property Type="Int32" Name="Consecutivo" Nullable="false" />
+          <Property Type="String" Name="Nombre" Nullable="false" MaxLength="100" />
+          <Property Type="String" Name="Correo" Nullable="false" MaxLength="100" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -141,10 +179,13 @@
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Estado" ColumnName="Estado" />
                 <ScalarProperty Name="IdRol" ColumnName="IdRol" />
+                <ScalarProperty Name="EsClaveTemporal" ColumnName="EsClaveTemporal" />
+                <ScalarProperty Name="ClaveVencimiento" ColumnName="ClaveVencimiento" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <FunctionImportMapping FunctionImportName="RegistrarUsuario" FunctionName="KN_WEB_BDModel.Store.RegistrarUsuario" />
+          <FunctionImportMapping FunctionImportName="ActualizarUsuario" FunctionName="KN_WEB_BDModel.Store.ActualizarUsuario" />
+          <FunctionImportMapping FunctionImportName="CambiarEstadoUsuario" FunctionName="KN_WEB_BDModel.Store.CambiarEstadoUsuario" />
           <FunctionImportMapping FunctionImportName="IniciarSesion" FunctionName="KN_WEB_BDModel.Store.IniciarSesion">
             <ResultMapping>
               <ComplexTypeMapping TypeName="KN_WEB_BDModel.IniciarSesion_Result">
@@ -154,6 +195,18 @@
                 <ScalarProperty Name="Correo" ColumnName="Correo" />
                 <ScalarProperty Name="Estado" ColumnName="Estado" />
                 <ScalarProperty Name="IdRol" ColumnName="IdRol" />
+                <ScalarProperty Name="EsClaveTemporal" ColumnName="EsClaveTemporal" />
+                <ScalarProperty Name="ClaveVencimiento" ColumnName="ClaveVencimiento" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="RegistrarUsuario" FunctionName="KN_WEB_BDModel.Store.RegistrarUsuario" />
+          <FunctionImportMapping FunctionImportName="ValidarUsuarioIdentificacion" FunctionName="KN_WEB_BDModel.Store.ValidarUsuarioIdentificacion">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="KN_WEB_BDModel.ValidarUsuarioIdentificacion_Result">
+                <ScalarProperty Name="Consecutivo" ColumnName="Consecutivo" />
+                <ScalarProperty Name="Nombre" ColumnName="Nombre" />
+                <ScalarProperty Name="Correo" ColumnName="Correo" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
